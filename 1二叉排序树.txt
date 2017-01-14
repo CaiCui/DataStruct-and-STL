@@ -1,0 +1,122 @@
+//二叉排序树
+#include<iostream>
+using namespace std;
+
+//树定义
+typedef struct node{
+  int data;
+  struct node *lchild;
+  struct node *rchild;
+}*BiTree,BiTNode;
+int EQ(int a,int b)
+{
+   if(a==b)
+	   return 1;
+   return 0;
+}
+int LT(int a,int b)
+{
+   if(a<b)
+	   return 1;
+   return 0;
+}
+
+//查找
+bool search(BiTree T,int key,BiTree f,BiTree &p)//T为根节点，f指向T的双亲，p记录最后找到的结点指针，找到则记录找到的，否则记录其父亲
+{
+	if(!T)
+	{
+		p=f;
+		return false;
+	}
+	else if(EQ(key,T->data))//注意T为指针类型，所以用→，若是(*T).data是对的
+	{
+		p=T;
+		return true;
+	}
+	else if(LT(key,T->data))
+	{
+		return search(T->lchild,key,T,p);
+	}
+	else
+		return search(T->rchild,key,T,p);
+
+}
+//插入
+bool insert(BiTree &T,int e)
+{
+  BiTree p,s;
+  if(!search(T,e,NULL,p))
+  {
+          s=(BiTree)malloc(sizeof(BiTNode));
+          s->data=e;
+		  s->lchild=NULL;
+		  s->rchild=NULL;
+		  if(!p)//考虑到第一次建树的时候
+			  p=s;//为根 
+		  else if(LT(e,p->data))
+			  p->lchild=s;
+		  else
+			  p->rchild=s;
+		  return true;
+
+  }
+  else
+    return false;
+}
+
+//删除,有三种1.叶子2.只有左子树或右子树3.左右子树均有;1包含在2中
+bool Delete(BiTree &p)
+{
+	BiTree q,s;
+	if(!p->rchild)//只有左子树
+	{
+        q=p;
+		p=p->lchild;
+		free(q);
+	}
+	else if(!p->rchild)//只有右子树
+	{
+		q=p;
+		p=p->rchild;
+		free(q);
+	}
+	else//覆盖法
+	{
+		q=p;
+        s=p->lchild;
+		while(s->rchild)//先向左，然后一直向右,s记录最后一个合理的点，q记录s的父结点
+		{
+			q=s;
+			s=s->rchild;
+		}
+		p->data=s->data;//p点被s处覆盖
+		if(q!=p)
+			q->rchild=s->lchild;
+		else
+			q->lchild=s->lchild;
+        delete s;//删除最后一个多余的结点s
+       
+	}
+	return true;
+}
+bool DeleteBST(BiTree &T,int key)
+{
+  if(!T)//没找到
+	  return false;
+  else
+  {
+	  if(EQ(key,T->data))
+		  return Delete(T);
+	  else if(LT(key,T->data))
+		  return DeleteBST(T->lchild,key);
+	  else
+		  return DeleteBST(T->rchild,key);
+
+  }
+}
+
+int main()
+{
+	return 0;
+}

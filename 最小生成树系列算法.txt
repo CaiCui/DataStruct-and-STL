@@ -1,0 +1,145 @@
+//最小生成树(MST:multiple spanning tree)标准程序,描述:n个结点间有n-1条边。如何找出一个总代价最小的连通路径
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+//Prim,从点入手搜索最小点，O(n^2)只与点有关适合求稠密边图
+/*思路:
+1.初始化。把每个点i的最近点数组标记为起点closet[i]=v，把每个点到邻近点的距离均先设置为到起点的距离lowcost[i]=a[v][i];
+不能连通的距离即为INF(最大)，这个数组会在后面不断更新，以获得该点实际在最终最小生成树中与相邻点的距离。vis[]数组全部初始化为0;
+2.vis[v]=1,开始n-1次循环,然后遍历所有点循环找没用过的且lowcos[i]最小的一个j，输出，并标记vis[j]=true加入已用过的顶点集
+3.遍历所有的点，对于没有加入顶点集的点，比较a[j][k]和lowcost[k]的大小, 若a[j][k]<lowcost[k]更新lowcost[k]=a[j][k],closest[k]=j;
+*/
+//算法一
+const int INF=0x3f3f3f3f;
+const int MAXN=110;
+bool vis[MAXN];
+int lowc[MAXN];
+int Prim(int cost[][MAXN],int n)//点是0~n-1,矩阵是cost[][]数组,返回最小生成树总的代价和
+{
+    int ans=0;
+    memset(vis,false,sizeof(vis));
+    vis[0]=true;
+    for(int i=1;i<n;i++)
+        lowc[i]=cost[0][i];
+    for(int i=1;i<n;i++)
+    {
+        int minc=INF;
+        int p=-1;//原图不连通
+        for(int j=0;j<n;j++)
+        {
+            if(!vis[j]&&lowc[j]<minc)
+            {
+                minc=lowc[j];
+                p=j;
+            }
+            if(minc==INF)return -1;//原图不连通
+            ans+=minc;
+            vis[p]=true;
+            for(int j=0;j<n;j++)
+                if(!vis[j]&&cost[p][j]<lowc[j])
+                   lowc[j]=cost[p][j];
+        }
+
+    }
+    return ans;
+}
+/*
+//算法二,求路径
+#define maxn 10000
+int a[6][6];
+void prim(int n)//假定0是原点
+{
+	bool s[100];
+	int lowcost[100];
+	int closest[100];
+    int i,k;
+	//初始化
+    for(i=1;i<n;i++)
+	{
+		lowcost[i]=a[0][i];
+		closest[i]=0;
+		s[i]=false;
+	}
+	s[0]=true;//第一个点选中
+
+    for(i=0;i<n-1;i++)//执行n-1次
+	{
+        int min=maxn;
+		int j=0;
+		for(k=1;k<n;k++)
+          if((!s[k])&&(lowcost[k]<min))//找第一条最小边
+		  {
+                 j=k;
+				 min=lowcost[k];
+		  }
+        cout<<j<<' '<<closest[j]<<endl;
+
+        s[j]=true;//顶点加入
+
+		for(k=1;k<n;k++)
+			if((!s[k])&&(c[j][k]<lowcost[k]))
+			{ lowcost[k]=c[j][k];  closest[k]=j;}
+
+	}
+
+}
+*/
+//Kruscal,从边入手搜索最小边,O(eloge)与边有关适合于边稀疏图,并查集
+
+const int MAXM=10000;//最大边数
+int F[MAXN];
+struct Edge{
+ int u,v,w;
+}edge[MAXN];
+int tot;//存储边数
+void  addedge(int u,int v,int w)
+{
+    edge[tot].u=u;
+    edge[tot].v=v;
+    edge[tot++].w=w;
+
+}
+bool cmp(Edge a,Edge b)
+{
+    return a.w<b.w;
+}
+int find(int x)
+{
+    if(F[x]==-1)
+        return x;
+    else
+        return F[x]=find(F[x]);
+}
+int kruscal(int n)//n点数
+{
+    memset(F,-1,sizeof(F));
+    sort(edge,edge+tot,cmp);
+    int cnt=0;
+    int ans=0;
+    for(int i=0;i<tot;i++)
+    {
+        int u=edge[i].u;
+        int v=edge[i].v;
+        int w=edge[i].w;
+        int t1=find(u);
+        int t2=find(v);
+        if(t1!=t2)
+        {
+            ans+=w;
+            F[t1]=t2;
+            cnt++
+        }
+        if(cnt==n-1)break;
+
+    }
+    if(cnt<n-1)
+        return -1;//不连通
+    else
+        return ans;
+}
+
+int main()
+{
+    return 0;
+}

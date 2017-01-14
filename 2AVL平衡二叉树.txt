@@ -1,0 +1,451 @@
+//AVL树,具体可以看书，书上有图讲解很清晰,此算法每次都只对4种情况进行局部处理，所以最多局部树不会超过2层
+#include<time.h>  
+#include<stdio.h>    
+#include<stdlib.h>   
+//左子树比右子树高一  
+#define LH 1  
+//左子树和右子树一样高  
+#define EH 0  
+//左子树比右子树低一  
+#define RH -1  
+#define EQ(a,b) ((a) == (b))  
+#define LT(a,b) ((a) < (b))  
+#define LQ(a,b)((a) <= (b))  
+  
+typedef struct BSTNode  
+{  
+    int data;  
+    int bf;  
+    BSTNode * lchild;  
+    BSTNode * rchild;  
+}BSTNode;  
+typedef BSTNode * BSTree;  
+  
+//  左旋  
+void leftRotate(BSTree & root)   
+{  
+    BSTree rc = root->rchild;  
+    root->rchild = rc->lchild;  
+    rc->lchild = root;  
+    root = rc;  
+}  
+//  右旋  
+void rightRotate(BSTree & root)   
+{  
+    BSTree lc = root->lchild;  
+    root->lchild = lc->rchild;  
+    lc->rchild = root;  
+    root = lc;  
+}  
+//  对二叉树root进行左平衡处理(LL型和LR型)  
+void leftBalance(BSTree & root)   
+{  
+    BSTree lc = root->lchild;  
+    switch (lc->bf)   
+    {  
+        //LL型的只需要进行右旋操作  
+    case LH:  
+        //右旋之后根和左子树都的平衡的  
+        root->bf = EH;  
+        lc->bf = EH;  
+        //右旋操作  
+        rightRotate(root);  
+        break;  
+        //LR型的需要进行左旋操作，然后右旋操作  
+
+	case EH:{//这是对删除来说的情况，删除可能出现  EH情况 具体见word文档 AVL树详解
+		 lc->bf=RH;
+		 root->bf=LH;
+		 rightRotate(root);
+		 break;
+			}
+
+    case RH: { 
+        BSTree rc = lc->rchild;  
+        switch (rc->bf)   
+        {  
+        case LH:  
+            root->bf = RH;  
+            lc->bf = EH;  
+            break;  
+        case EH:  
+            root->bf = EH;  
+            lc->bf = EH;  
+            break;  
+        case RH:  
+            root->bf = EH;  
+            lc->bf = LH;  
+            break;  
+        }  
+        rc->bf = EH;  
+        leftRotate(root->lchild);  
+        rightRotate(root);  
+        break;  }
+
+    }  
+}  
+//  功能：对二叉树root进行左平衡处理(RR型和RL型)  
+void rightBalance(BSTree & root)   
+{  
+    BSTree rc = root->rchild;  
+    switch (rc->bf)   
+    {  
+        //RR型只需要做左旋操作  
+    case RH:  
+        root->bf = EH;  
+        rc->bf = EH;  
+        //左旋操作  
+        leftRotate(root);  
+        break;  
+        //RL型需要先做右旋操作，然后做左旋操作  
+    case LH:  
+		{ BSTree lc = rc->lchild;  
+        switch (lc->bf)   
+        {  
+        case LH:  //实际上是多余的,因为我们的算法每次都控制层数在2以内，即总以最小情况出现时就调整，所以不会出现3层结构
+            root->bf = EH;  
+            rc->bf = RH;  
+            break;  
+        case EH:  
+            root->bf = EH;  
+            rc->bf = EH;  
+            break;  
+        case RH:  //实际上是多余的
+            root->bf = LH;  
+            rc->bf = EH;  
+            break;  
+        }  
+        lc->bf = EH;  
+        rightRotate(root->rchild);  
+        leftRotate(root);  
+        break;  }
+	case EH://这是对删除来说的情况，删除可能出现  EH情况 具体见word文档 AVL树详解
+		{
+		 rc->bf=LH;
+		 root->bf=RH;
+		 leftRotate(root);
+		 break;}
+
+    }  
+}  
+//  功能：把元素data插入平衡二叉树root中  
+bool insert(BSTree & root, int data, bool & taller)   
+{  
+    if (NULL == root)   
+    {  
+        root = (BSTree)malloc(sizeof(BSTNode));  
+        root->rchild = NULL;  
+        root->lchild = NULL;  
+        root->data = data;  
+        root->bf = EH;  
+        taller = true;  
+    }  
+    else  
+    {  
+        //该元素已经在平衡二叉树中存在了  
+        if (data == root->data)   
+        {  
+            taller = false;  
+            return false;  
+        }  
+        //插入左子树  
+        else if (data < root->data)   
+        {  
+            if (!insert(root->lchild, data, taller))   
+            {  
+                return false;  
+            }  
+            //插入成功，并且树变高了  
+            if (taller)   
+            {  
+                switch (root->bf)   
+                {  
+                case LH:  
+                    leftBalance(root);  
+                    //平衡二叉树做完左平衡操作后  
+                    //树高没有变化，故taller = false  
+                    taller = false;  
+                    break;  
+                case EH:  
+                    root->bf = LH;  
+                    //原来是平衡的故插入一个元素后  
+                    //树高必然变高  
+                    taller = true;  
+                    break;  
+                case RH:  
+                    root->bf = EH;  
+                    //原来是右子树比左子树高，但是当向左子树中  
+                    //插入一个元素的时候，树变平衡了，故taller = false  
+                    taller = false;  
+                    break;  
+                default:  
+                    break;  
+                }  
+            }  
+        }  
+        //插入右子树  
+        else   
+        {  
+            if (!insert(root->rchild, data, taller))   
+            {  
+                return 0;  
+            }  
+            if (taller)   
+            {  
+                switch (root->bf)   
+                {  
+                case LH:  
+                    root->bf = EH;  
+                    taller = false;  
+                    break;  
+                case EH:  
+                    root->bf = RH;  
+                    taller = true;  
+                    break;  
+                case RH:  
+                    rightBalance(root);  
+                    taller = false;  
+                    break;  
+                }  
+            }  
+        }  
+    }  
+    return true;  
+}  
+//   在平衡二叉树中查找int节点  
+int * search(BSTree & root, int data)   
+{  
+    if (root ==NULL)   
+    {  
+        return NULL;  
+    }  
+      
+    if (root->data == data)   
+    {  
+        return &root->data;  
+    }  
+    else if (data < root->data)   
+    {  
+        return search(root->lchild, data);  
+    }   
+    else   
+    {  
+        return search(root->rchild, data);  
+    }  
+}  
+//  功能：输出平衡二叉树中的所有的元素（小->大，中序遍历）  
+void print(BSTree & root)  
+{  
+    if (NULL == root)   
+    {  
+        return ;  
+    }  
+      
+    print(root->lchild);  
+    printf("%d ",root->data);  
+    print(root->rchild);  
+}  
+//  功能：释放平衡二叉树的空间  
+void clear(BSTree & root)   
+{  
+    if (NULL == root)   
+    {  
+        return ;  
+    }  
+    clear(root->lchild);  
+    clear(root->rchild);  
+    free(root);  
+}  
+
+
+int DeleteAVL(BSTree &T, int key, bool &shorter){  
+    if (!T)  
+    {//No such key  
+        shorter = false;  
+        return 0;  
+    }  
+    else  
+    {  
+        if (EQ(key, T->data))    //找到了需要删除的结点  
+        {  
+            //如果该结点的lchild 和  
+            //rchild 至少有一个为NULL  
+            //则大功告成，否则请参照  
+            //下方解释  
+            BSTree q = T;  
+            if (!T->lchild)//如果该结点的lchild 为NULL  
+            {  
+                q = T;  
+                T = T->rchild;  
+                free(q);  
+                shorter = true;  
+                return 1;  
+            }  
+            else if (!T->rchild){//如果该结点的rchild 为 NULL  
+                q = T;  
+                T = T->lchild;//如果不是&（引用）的强大功能，这句话是没有意义的  
+                free(q);  
+                shorter = true;  
+                return 1;  
+            }  
+            else {  
+                //删除一个左右孩子都不为空的结点  
+                //使该结点的直接前驱p的data替换该结点的data  
+                //然后改变key=p.data  
+                BSTree s = T->lchild;  
+                while (s->rchild)  
+                    s = s->rchild;  
+                T->data = s->data;  
+                key = s->data;//Now, delete the vertice whose data was the new key  
+            }  
+        }  
+        if (LQ(key, T->data)){//这里与InsertAVL不同  
+            if (!DeleteAVL(T->lchild, key, shorter)) return 0;  
+		
+            if (shorter){  
+                switch(T->bf){  
+                case LH:T->bf = EH; shorter = true;break;  
+                case EH:T->bf = RH;shorter = false;break;  
+                case RH:
+					   
+					     
+                    if (T->rchild->bf== EH)  
+                        shorter = false;  
+                    else   
+                        shorter = true;
+				  	rightBalance(T);
+					break;  
+                }  
+            }  
+        }  
+        else{  
+            if (!DeleteAVL(T->rchild, key, shorter)) return 0; 
+		
+            if (shorter){  
+                switch(T->bf){  
+                case LH:
+					   
+					    	
+                    if ( T->lchild->bf== EH)  
+                        shorter = false;  
+                    else   
+                        shorter = true;
+					  leftBalance(T);
+				
+					break;  
+                case EH:T->bf = LH; shorter = false;break;  
+                case RH:T->bf = EH;shorter = true;break;  
+                }  
+            }  
+        }  
+    }  
+    return 1;  
+}//Delete  
+void menu()    
+{    
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙ ⊙☆⊙    主菜单     ⊙☆⊙ ⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");    
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙请按№ 1:连续插入数据 输入0结束插入⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");    
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙请按№ 2:查找数据                  ⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");    
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙请按№ 3删除特定数据               ⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");    
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙请按№ 4输出当前结果                   ⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");   
+    printf("⊙☆⊙ ⊙☆⊙ ⊙☆⊙请按№ 5结束程序                   ⊙☆⊙ ⊙☆⊙ ⊙☆⊙\n");  
+}    
+int main()  
+{  
+    BSTree root = NULL;  
+    int num,n;  
+    bool taller = false,shorter;  
+    system("color 2e");    
+    menu();  
+    while(1)    
+    {    
+        scanf("%d",&num);   
+        //if(num==5) break;  
+        switch (num)    
+        {    
+        case 1:  
+            system("cls");  
+            printf("请插入数据 ，输入0结束插入\n");  
+            while(scanf("%d",&n))  
+            {  
+                if(n==0) break;  
+                else insert(root,n,taller);  
+            }  
+		
+
+            system("cls"); 
+		  	printf("%d %d\n",root->data,root->bf);
+            printf("%d %d\n",root->rchild->data,root->rchild->bf);
+            printf("%d %d\n",root->lchild->data,root->lchild->bf);
+
+            menu();  
+            break;  
+        case 2:   
+            system("cls");  
+            printf("请输入要查询的数\n");  
+            scanf("%d",&n);  
+            int *p;  
+            p=search(root,n);  
+            if (p==NULL)   
+            {  
+                printf("对不起 没有找到 %d!\n",n);  
+            }  
+            else   
+            {  
+                printf("恭喜你 数据中存在 %d!\n",n);  
+            }  
+            menu();  
+            break;    
+        case 3:   
+            system("cls");  
+            printf("请输入要删除的数据\n");  
+            scanf("%d",&n);  
+            DeleteAVL(root,n,shorter);  
+		 	printf("%d %d\n",root->data,root->bf);
+          
+            printf("%d %d\n",root->rchild->data,root->rchild->bf);
+            printf("%d %d\n",root->lchild->data,root->lchild->bf);
+            
+            break;  
+        case 4:  
+            system("cls");  
+            print(root);   
+            printf("输入0进入主菜单\n");  
+            scanf("%d",&n);  
+            if(!n)  
+              menu();  
+            break;  
+        case 5:  
+            clear(root);  
+            return 0;         
+        }  
+    }  
+    return 0;  
+}
+/*
+删除思路详解:
+从平衡二叉树中删除节点更为复杂。首先第一步需要找到要删除的节点x，并分情况进行处理：
+
+如果要删除的节点为叶子节点，就找到了要删除的节点
+如果要删除的节点为只有一棵子树的节点就找到了要删除的节点
+如果要删除的节点既有左子树，又有右子树，则
+如果该节点的平衡因子为0或者1，则找到其左子树中具有最大值的节点max（我们只讨论有序平衡二叉树，并且有序平衡二叉树中任意一个节点的左子树上的所有节点的值小于该节点的值，右子树上所有节点的值大于该节点的值），将max的内容与x的内容交换（只替换保存的真正的数据，不替换指针，平衡因子等用于管理目的的信息），并且max即为新的要删除的节点。由于树是有序的，因而这样找到的节点要么是一个叶子节点，要么是一个没有右子树的节点。
+如果该节点的平衡因子为-1，则找到其右节点中具有最小值的节点min，将min的内容与x的内容交换，并且min即为新的要删除的节点。由于树是有序的，因而这样找到的节点要么是一个叶子节点，要么是一个没有左子树的节点。
+在找到要删除的节点后下一步就是删除节点，假设要删除的节点为delete，其父节点为parent，显然此时delete要么是一个叶子节点，要么是一个只有一棵子树的节点：
+
+如果delete是一个叶子节点，则直接删除它
+如果delete是一个只有一棵子树的节点，则将delete删除，delete节点的子树的根将成为parent的子节点
+无论是这两种情形中的哪一种都会导致节点parent的以delete节点为根节点的子树的高度降低，因此下一步就是处理高度降低的影响。假设删除节点导致以节点A为根的子树的高度降低了，并且A的父节点为B则：
+
+如果B为NULL，即A已经为根节点，则删除完成
+否则考察B的平衡因子：
+平衡因子为0，只需要调整平衡因子即可完成删除
+平衡因子表示以A为子树的根的高度较高，则B的新的平衡因子为0，以B为根的子树的高度降低，需要回溯往前继续处理高度降低的影响
+平衡因子表示以A为子树的根的高度较矮，则以B为根的子树违背了平衡二叉树的要求，需要对以B为根的子树进行调整，如果调整完后得到的新的子树的高度和原来以B为根的子树的高度相同，则删除完成，否则新得到的子树的高度与原来的以B为根的子树的高度相比必然是减小了，因而还需要继续往前回溯处理高度降低的影响
+
+
+*/
+
+
+
+

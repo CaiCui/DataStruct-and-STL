@@ -1,0 +1,135 @@
+//哈弗曼树编码与解码,WPL=Wk*Lk之和带权路径和
+#include<iostream>
+#include<vector>
+#include<queue>
+#include<cstring>
+using namespace std;
+struct cmp{
+  bool operator()(int&a,int &b)
+  {
+       return a>b;
+  }
+};
+
+priority_queue<int,vector<int>,cmp>data;
+int pq[10];//存储结点元素
+//定义树
+typedef struct{
+   
+	unsigned int weight;
+    unsigned int parent,lchild,rchild;
+	int flag;
+
+}HTNode,*HuffmanTree;
+
+typedef char ** Huffmancode;
+
+void Select(int &a,int &b,HuffmanTree &HT,int n)// 假设树节点全为整数处理
+{  
+   int i,flag1,flag2;
+   a=data.top();
+   data.pop();
+   b=data.top();
+   data.pop();
+   data.push(a+b);
+   flag1=flag2=false;
+   for(i=1;i<n;i++)
+   {
+	   if(HT[i].weight==a&&!flag1&& HT[i].flag==0)
+	   {
+		   a=i;
+		   flag1=true;
+		   HT[i].flag=1;
+	   }
+	   if(HT[i].weight==b&&!flag2&& HT[i].flag==0)
+	   {
+		   b=i;
+		   flag2=true;
+		   HT[i].flag=1;
+	   }
+	   if(flag1&&flag2)
+		   break;
+   }
+
+}
+
+void huffmancode(HuffmanTree &HT,Huffmancode &HC,int n)//编码建树,贪心法,解码,注意哈弗曼结点由于可能存在重复所以树不唯一但他们的wpl值相同
+{
+  if(n<=1)return;
+  int m,i,s1,s2;
+  m=2*n-1;//树节点个数
+  HT=(HuffmanTree)malloc((m+1)*sizeof(HTNode));//0号未用
+  HuffmanTree p;
+  for(p=HT+1,i=1;i<=n;i++,p++)
+  {  
+	 (*p).weight=pq[i];
+     (*p).parent=0;
+	 (*p).lchild=0;
+	 (*p).rchild=0;
+	 (*p).flag=0;
+  }//对树数组初始化
+
+  for(;i<=m;i++,p++)
+  {
+	 (*p).weight=0;
+     (*p).parent=0;
+	 (*p).lchild=0;
+	 (*p).rchild=0;
+	 (*p).flag=0;
+  }
+  for(i=n+1;i<=m;i++)//建树
+  {
+     Select(s1,s2,HT,i);//选取当前最小两个元素
+	 HT[i].lchild=s1;
+	 HT[i].rchild=s2;
+     HT[s1].parent=i;
+	 HT[s2].parent=i;
+	 HT[i].weight=HT[s1].weight+HT[s2].weight;
+
+  }
+  //编码
+  HC=(Huffmancode)malloc(sizeof(char *)*(n+1));
+  char *cd;
+  cd=(char *)malloc(sizeof(char)*n);
+  cd[n-1]='\0';
+  int start,c,f;
+  for(i=1;i<=n;i++)//对每个叶子求编码
+  {
+      start=n-1;
+	  for(c=i,f=HT[i].parent;f!=0;c=f,f=HT[f].parent)
+		  if(c==HT[f].lchild)
+			  cd[--start]='0';
+		  else
+              cd[--start]='1';
+     HC[i]=(char *)malloc(sizeof(char)*(n-start));
+	 strcpy(HC[i],&cd[start]);
+
+  }
+  free(cd);
+
+}
+
+int main()
+{  
+    
+	int i,n;
+	cin>>n;
+	for(i=1;i<=n;i++)
+	{
+		cin>>pq[i];
+		data.push(pq[i]);
+	}
+
+    HuffmanTree a;
+    Huffmancode b;
+    huffmancode(a,b,n);
+	
+	for(i=1;i<=n;i++)
+	{   
+		cout<<a[i].weight<<"的编码为:";
+		cout<<b[i]<<endl;
+	}
+		
+	return 0;
+
+}

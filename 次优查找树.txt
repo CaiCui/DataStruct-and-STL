@@ -1,0 +1,113 @@
+//次优查找树，适用于有序表中各个记录的查找概率不相等情况，查找性能高于二分查找
+#include <iostream>  
+#include <cmath>  
+using namespace std;  
+typedef struct treenode  
+{  
+    char data;  
+    int weight;  
+    treenode *left; 
+    treenode *right;  
+}Treenode,*Treep;  
+  
+//初始化二叉树  
+void init_tree(Treep &root)  
+{  
+    root=NULL;  
+    cout<<"初始化成功!"<<endl;  
+}  
+void creatsw(int sw[],int length,int w[])//w为权值数组,存放待排序元素的权值
+{    
+	w[0]=sw[0]=0;
+	
+   for(int i=1;i<length;i++)
+	   sw[i]=w[i]+sw[i-1];
+
+}
+  
+//创建二叉树  
+void SecondOptimal(Treep &rt, char R[],int sw[], int low, int high)//low从1开始，sw[]存放累加和,数组长度为序列长度+1,0号位值为0
+{  
+    //由有序表R[low....high](非递减顺序按某关键字排序)及其累积权值表sw(其中sw[0]==0)递归构造次优查找树T  
+    int i=low;  
+    int min = fabs(sw[high] - sw[low]);  
+    int dw = sw[high] + sw[low-1];  
+    for(int j=low; j<=high; ++j)        //选择最小的ΔPi值  
+    {  
+        if(fabs(dw-sw[j]-sw[j-1]) < min)  
+        {  
+            i=j;  
+            min=fabs(dw-sw[j]-sw[j-1]);  
+        }  
+    }  
+    rt=new Treenode;  
+    rt->data=R[i];        //生成节点  
+    if(i==low)            //左子树为空  
+        rt->left = NULL; 
+    else                //构造左子树  
+        SecondOptimal(rt->left, R, sw, low, i-1);  
+  
+    if(i==high)            //右子树为空  
+        rt->right = NULL;
+    else                //构造右子树  
+        SecondOptimal(rt->right, R, sw, i+1, high);  
+
+}//SecondOptimal  
+  
+//前序遍历二叉树  
+void pre_order(Treep rt)  
+{  
+    if(rt)  
+    {  
+        cout<<rt->data<<"  ";  
+        pre_order(rt->left);  
+        pre_order(rt->right);  
+    }  
+}  
+  
+//中序遍历二叉树  
+void in_order(Treep rt)  
+{  
+    if(rt)  
+    {  
+        in_order(rt->left);  
+        cout<<rt->data<<"  ";  
+        in_order(rt->right);  
+    }  
+}  
+  
+//后序遍历二叉树  
+void post_order(Treep rt)  
+{  
+    if(rt)  
+    {  
+        post_order(rt->left);  
+        post_order(rt->right);  
+        cout<<rt->data<<"  ";  
+    }  
+}  
+  
+//查找二叉树中是否存在某元素  
+int seach_tree(Treep &rt,char key)  
+{  
+    if(rt==NULL)   
+        return 0;   
+    else   
+    {   
+        if(rt->data==key)   
+        {  
+            return 1;  
+        }  
+        else  
+        {  
+            if(seach_tree(rt->left,key) || seach_tree(rt->right,key))  
+                return 1;    //如果左右子树有一个搜索到，就返回1  
+            else  
+                return 0;    //如果左右子树都没有搜索到，返回0  
+        }  
+    }  
+} 
+int main()
+{
+return 0;
+}

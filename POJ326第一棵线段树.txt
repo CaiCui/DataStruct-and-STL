@@ -1,0 +1,103 @@
+//POJ3264,第一个线段树
+#include<iostream>
+using namespace std;
+int MAX=-0xffffff0;
+int MIN=0xffffff0;
+int fmin;
+int fmax;
+struct linetree{
+   int max;
+   int min;
+   int L,R;
+   int Mid(){
+     return (L+R)/2;
+   }
+
+};
+linetree tree[800000];//数组存树
+int Max(int a,int b)
+{
+    return a>b?a:b;
+}
+int Min(int a, int b)
+{
+	return a<b?a:b;
+}
+
+void initialtree(int root,int l,int r)//初始化线段树
+{
+   tree[root].max=MAX;
+   tree[root].min=MIN;
+   tree[root].L=l;
+   tree[root].R=r;
+   if(l!=r)
+   {
+	   initialtree(2*root+1,l,(l+r)/2);
+	   initialtree(2*root+2,(l+r)/2+1,r);
+   }
+
+}
+void insert(int root,int i,int v)//插入元素
+{ 
+
+  if(tree[root].L==tree[root].R)//叶子为终止结点
+  {
+    tree[root].max= tree[root].min=v;
+	return;
+  }
+  tree[root].max=Max(v,tree[root].max);
+  tree[root].min=Min(v,tree[root].min);
+  if(i<=tree[root].Mid())
+	  insert(root*2+1,i,v);
+  else
+	  insert(root*2+2,i,v);
+}
+
+void search(int root,int s,int e)//s:区间开始,e:区间结束
+{   
+   
+    if(tree[root].max<=fmax&&tree[root].min>=fmin)
+		return;
+	if(tree[root].L==s&&tree[root].R==e)
+	{
+          fmin=Min(fmin,tree[root].min);
+		  fmax=Max(fmax,tree[root].max);
+		  return;
+	}
+   if(e<=tree[root].Mid())
+	   search(root*2+1,s,e);
+   else if(s>tree[root].Mid())
+	   search(root*2+2,s,e);
+   else
+   {
+          search(root*2+1,s,tree[root].Mid());
+          search(root*2+2,tree[root].Mid()+1,e);
+   }
+}
+int main()
+{   
+    int n,m,v;
+	int i,j,p,q;
+	 
+     cin>>n>>m;
+	  initialtree(0,1,n);
+      for(i=1;i<=n;i++)
+	  {   
+		  cin>>v;
+		  insert(0,i,v);
+	  }
+	 
+      
+	  for(j=0;j<m;j++)
+	  {
+		  cin>>p>>q;
+		  fmin=MIN;
+	      fmax=MAX;
+		  search(0,p,q);
+          cout<<fmax-fmin<<endl;
+	  }
+
+	
+    
+	return 0;
+}
