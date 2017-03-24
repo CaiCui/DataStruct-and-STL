@@ -1,0 +1,188 @@
+///排序专题复习(sort为主)
+#include<iostream>
+using namespace std;
+#include<algorithm>
+#include<cstring>
+///sort 函数
+/**
+sort()时间复杂度:n*log2(n)
+这个函数可以传两个参数或三个参数。第一个参数是要排序的区间首地址，第二个参数是区间尾地址的下一地址。
+也就是说，排序的区间是 [a,b) 。简单来说，有一个数组 int a[100] ，
+要对从 a[0] 到 a[99] 的元素进行排序，只要写 sort(a,a+100) 就行了，默认的排序方式是升序。
+假设自己定义了一个结构体node
+struct node{
+    int a;
+    int b;
+    double c;
+}
+
+有一个node类型的数组node arr[100]，想对它进行排序：先按a值升序排列，如果a值相同，再按b值降序排列，
+如果b还相同，就按c降序排列。就可以写这样一个比较函数：
+以下是代码片段：
+bool cmp(node x,node y)
+{
+     if(x.a!=y.a) return x.a<y.a;
+     if(x.b!=y.b) return x.b>y.b;
+     return x.c>y.c;
+}
+排序时写sort(arr, arr+100, cmp);
+*/
+bool cmp(int a,int b)
+{
+    return a<b;
+}
+bool fun(const char *s1, const char *s2){
+    if(strcmp(s1, s2) < 0)
+        return true;
+    else
+        return false;
+}
+int main()
+{   
+    /*
+    int f[201];
+    int n,i;
+    while(cin>>n)
+    {
+        for(i=0;i<n;i++)
+            cin>>f[i];
+        sort(f,f+n,cmp);
+        for(i=0;i<n-1;i++)
+            cout<<f[i]<<" ";
+        cout<<f[i]<<endl;
+    }
+    */
+    char *names[]=
+    {
+     "could",
+     "you",
+     "sort",
+     "me",
+     "please",
+     "thank",
+     "you!"
+    };
+    for(int i = 0; i < 7; ++i){
+        cout << names[i] << ends;
+    }
+    cout << endl;
+    sort(&names[0], &names[7], fun);
+    for(int i = 0; i < 7; ++i){
+        cout << names[i] << ends;
+    }
+    cout << endl;
+    return 0;
+    return 0;
+}
+
+qsort():
+用 法： void qsort(void *base,int nelem,int width,int (*fcmp)(const void *,const void *));
+参数： 1 待排序数组首地址
+2 数组中待排序元素数量
+3 各元素的占用空间大小
+4 指向函数的指针，用于确定排序的顺序
+
+1.比如：对一个长为1000的数组进行排序时，int a[1000]; 那么base应为a，num应为 1000，width应为 sizeof(int)，comp函数随自己的命名。
+qsort(a,1000,sizeof(int),comp);
+其中comp函数应写为：
+
+intcomp(const void *a,const void *b)
+{
+return *(int*)a-*(int*)b;
+}
+上面是由小到大排序，return *(int *)b - *(int *)a; 为由大到小排序。
+
+对double型排序!!!!!:
+int cmp(const void * a, const void * b)
+{
+     return((*(double*)a-*(double*)b>0)?1:-1);
+}
+
+
+2.对字符串数组的排序(char s[][]型)
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+char s[100][100];
+int i,n;
+
+int cmp(const void *a,const void *b)
+{
+     return(strcmp((char*)a,(char*)b));
+}
+
+int main()
+{
+     scanf("%d",&n);
+     for(i=0;i<n;i++) scanf("%s",s[i]);
+
+    
+     qsort(s,n,sizeof(s[0]),cmp);
+    
+     for(i=0;i<n;i++) printf("%s\n",s[i]);
+    
+     return(0);
+}
+
+3.按结构体中某个关键字排序（对结构体一级排序）：
+structNode
+{
+double data;
+int other;
+}s[100];
+int Comp(const void *p1,const void *p2)
+{
+return(*(Node*)p2)->data>(*（Node*）p1)->data?1:-1;
+}
+qsort(s,100,sizeof(s[0]),Comp);
+
+4.对结构体中字符串进行排序：
+struct Node
+{
+int data;
+char str[100];
+}s[100];
+//按照结构体中字符串str的字典序排序
+int Comp(const void*p1,const void*p2)
+{
+return strcmp((*(Node*)p1).str,(*(Node*)p2).str);
+}
+qsort(s,100,sizeof(s[0]),Comp);
+
+5.对字符数组排序:
+int cmp(const void *a,const void *b)
+{
+     return(*(char *)a-*(char *)b);
+}
+
+6.对字符串数组排序(char *s[]型)
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+char *s[100];
+int i,n;
+
+int cmp(const void *a,const void *b)
+
+{
+     return(strcmp(*(char**)a,*(char**)b));
+}
+
+int main()
+{
+     scanf("%d",&n);
+     for(i=0;i<n;i++)
+     {
+         s[i]=(char*)malloc(sizeof(char*));
+         scanf("%s",s[i]);
+     }
+
+     qsort(s,n,sizeof(s[0]),cmp);
+
+     for(i=0;i<n;i++) printf("%s\n",s[i]);
+
+     return(0);
+}
