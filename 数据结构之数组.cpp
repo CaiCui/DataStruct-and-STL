@@ -1,22 +1,22 @@
 #include <bits/stdc++.h>
 using namespace std;
 /*
-    acmÊı×éĞ¡½á¡£×¢Òâ£ººÜ´óµÄÊı×éÒª¿ªÔÚº¯ÊıÍâµÄ¶Ñ¿Õ¼äÉÏ
+    acmæ•°ç»„å°ç»“ã€‚æ³¨æ„ï¼šå¾ˆå¤§çš„æ•°ç»„è¦å¼€åœ¨å‡½æ•°å¤–çš„å †ç©ºé—´ä¸Š
 */
 int main()
 {
-      //¶¨Òå
+      //å®šä¹‰
       int a[10];
       int b[10]={1,2,3,5};
       int c[10]{1,2,3,4,5};
       int m=10,n=10,h=10;
 
-      //¶¯Ì¬·ÖÅäc++Ò»Î¬Êı×ém£¬ÊÍ·Å
+      //åŠ¨æ€åˆ†é…c++ä¸€ç»´æ•°ç»„mï¼Œé‡Šæ”¾
       int *d=new int[m];
       d[0]=1;
-      delete []d;//»òdelete d;
+      delete []d;//æˆ–delete d;
 
-      //¶¯Ì¬·ÖÅäc++¶şÎ¬Êı×émxn£¬ÊÍ·Å
+      //åŠ¨æ€åˆ†é…c++äºŒç»´æ•°ç»„mxnï¼Œé‡Šæ”¾
       int **dd=new int *[m];
       for(int i=0;i<m;i++)
         dd[i]=new int [n];
@@ -24,7 +24,7 @@ int main()
         delete []dd[i];
       delete dd;
 
-      //ÈıÎ¬ÒÔ´ËÀàÍÆ mxnxh
+      //ä¸‰ç»´ä»¥æ­¤ç±»æ¨ mxnxh
       int ***ddd=new int **[m];
       for(int i=0;i<m;i++)
       {
@@ -36,20 +36,20 @@ int main()
       {
           for(int j=0;j<n;j++)
           {
-              delete ddd[i][j];//ÊÍ·ÅµÚÈıÎ¬µÄÒ»Î¬Êı×éh
+              delete ddd[i][j];//é‡Šæ”¾ç¬¬ä¸‰ç»´çš„ä¸€ç»´æ•°ç»„h
           }
-          delete ddd[i];//ÊÍ·ÅµÚ¶şÎ¬µÄ¶şÎ¬Êı×é
+          delete ddd[i];//é‡Šæ”¾ç¬¬äºŒç»´çš„äºŒç»´æ•°ç»„
       }
-      delete ddd;//ÊÍ·ÅµÚÒ»Î¬ÈıÎ¬Êı×é
+      delete ddd;//é‡Šæ”¾ç¬¬ä¸€ç»´ä¸‰ç»´æ•°ç»„
 
-      //¶¯Ì¬·ÖÅäcÓïÑÔÒ»Î¬Êı×é£¬ÊÍ·Å
+      //åŠ¨æ€åˆ†é…cè¯­è¨€ä¸€ç»´æ•°ç»„ï¼Œé‡Šæ”¾
       int *p=NULL;
       p=(int *)malloc(sizeof(int)*n);
       p[0]=2;
       cout<<p[0]<<endl;
-      free((void*)p);//´ËÊ±p[0]ÎªÒ»¸öÈÎÒâÊı
+      free((void*)p);//æ­¤æ—¶p[0]ä¸ºä¸€ä¸ªä»»æ„æ•°
 
-      //¶¯Ì¬·ÖÅäcÓïÑÔ¶şÎ¬Êı×émxn£¬ÊÍ·Å
+      //åŠ¨æ€åˆ†é…cè¯­è¨€äºŒç»´æ•°ç»„mxnï¼Œé‡Šæ”¾
       int **pp;
       pp=(int **)malloc(m*sizeof(int *));
       for(int i=0;i<m;i++)
@@ -58,7 +58,7 @@ int main()
          free((void*)pp[i]);
       free ((void *)pp);
 
-      //¶¯Ì¬·ÖÅäcÓïÑÔÈıÎ¬Êı×émxnxh£¬ÊÍ·Å
+      //åŠ¨æ€åˆ†é…cè¯­è¨€ä¸‰ç»´æ•°ç»„mxnxhï¼Œé‡Šæ”¾
       int ***ppp;
       ppp=(int ***)malloc(m*sizeof(int**));
       for(int i=0;i<m;i++)
