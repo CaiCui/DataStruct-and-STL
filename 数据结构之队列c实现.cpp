@@ -1,9 +1,9 @@
 #include<bits/stdc++.h>
 using namespace std;
 /*
-  Ê¡Ñ¡OIÊı¾İ½á¹¹Ö®¶ÓÁĞÊÖĞ´(Êı×é»òÁ´±íÊµÏÖ): Ë«¶Ë¶ÓÁĞ£¬Ñ­»·¶ÓÁĞ
+  çœé€‰OIæ•°æ®ç»“æ„ä¹‹é˜Ÿåˆ—æ‰‹å†™(æ•°ç»„æˆ–é“¾è¡¨å®ç°): åŒç«¯é˜Ÿåˆ—ï¼Œå¾ªç¯é˜Ÿåˆ—
 */
-//Ò»°ã¶ÓÁĞ¼òµ¥ÊµÏÖc
+//ä¸€èˆ¬é˜Ÿåˆ—ç®€å•å®ç°c
 typedef struct Queue{
 
   int sum=0;
@@ -43,14 +43,14 @@ typedef struct Queue{
        return 1;
    }
 }_Queue;
-//Ñ­»·¶ÓÁĞ¼òµ¥ÊµÏÖc
+//å¾ªç¯é˜Ÿåˆ—ç®€å•å®ç°c
 typedef struct CQueue{
 
-  int sum=0;//¶ÓÁĞ³¤¶È
+  int sum=0;//é˜Ÿåˆ—é•¿åº¦
   int *p=NULL;
   int countq;
-  int frontp;//¶ÓÍ·Ö¸Õë
-  int rearp;//¶ÓÎ²Ö¸Õë
+  int frontp;//é˜Ÿå¤´æŒ‡é’ˆ
+  int rearp;//é˜Ÿå°¾æŒ‡é’ˆ
   CQueue(){}
   CQueue(int n)
   {
